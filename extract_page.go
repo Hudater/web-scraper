@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/url"
 	"strings"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -36,4 +39,53 @@ func getFirstParagraphFromHTML(html string) string {
 		return paras
 	}
 	return ""
+}
+
+func getURLsFromHTML(htmlBody string, baseURL *url.URL) ([]string, error) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlBody))
+	if err != nil {
+		log.Fatal(err)
+	}
+	// THIS signature is copy pasta from boot.dev ch1-l5
+	// For each '<a href>' it finds, it will run this function.
+	urlSlice := []string{}
+	var docErr error
+	doc.Find("a[href]").Each(func(_ int, s *goquery.Selection) {
+		href, _ := s.Attr("href")
+		parsedHref, err := url.Parse(href)
+		if err != nil {
+			docErr = fmt.Errorf("unable to parse href %q: %w", href, err)
+			return
+		}
+		fullURL := baseURL.ResolveReference(parsedHref).String()
+		urlSlice = append(urlSlice, fullURL)
+	})
+	if docErr != nil {
+		return nil, docErr
+	}
+	return urlSlice, nil
+}
+
+func getImagesFromHTML(htmlBody string, baseURL *url.URL) ([]string, error) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlBody))
+	if err != nil {
+		log.Fatal(err)
+	}
+	// For each '<img src>' it finds, it will run this function.
+	imageURLSlice := []string{}
+	var docErr error
+	doc.Find("img[src]").Each(func(_ int, s *goquery.Selection) {
+		src, _ := s.Attr("src")
+		parsedSrc, err := url.Parse(src)
+		if err != nil {
+			docErr = fmt.Errorf("unable to parse image src %q: %w", src, err)
+			return
+		}
+		fullURL := baseURL.ResolveReference(parsedSrc).String()
+		imageURLSlice = append(imageURLSlice, fullURL)
+	})
+	if docErr != nil {
+		return nil, docErr
+	}
+	return imageURLSlice, nil
 }
