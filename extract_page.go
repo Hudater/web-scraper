@@ -44,7 +44,7 @@ func getFirstParagraphFromHTML(html string) string {
 func getURLsFromHTML(htmlBody string, baseURL *url.URL) ([]string, error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlBody))
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	// THIS signature is copy pasta from boot.dev ch1-l5
 	// For each '<a href>' it finds, it will run this function.
@@ -88,4 +88,39 @@ func getImagesFromHTML(htmlBody string, baseURL *url.URL) ([]string, error) {
 		return nil, docErr
 	}
 	return imageURLSlice, nil
+}
+
+type PageData struct {
+	URL            string
+	Heading        string
+	FirstParagraph string
+	OutgoingLinks  []string
+	ImageURLs      []string
+}
+
+func extractPageData(html, pageURL string) PageData {
+	parsedURL, err := url.Parse(pageURL)
+	if err != nil {
+		log.Printf("unable to parse URL")
+		return PageData{}
+	}
+	
+	linksSlice, err := getURLsFromHTML(html, parsedURL)
+	if err != nil {
+		log.Printf("unable to get links")
+	}
+	 
+	imagesSlice, err := getImagesFromHTML(html, parsedURL)
+	if err != nil {
+		log.Printf("unable to get images")
+	}
+	
+	pageDataStruct := PageData{
+		URL:            pageURL,
+		Heading:        getHeadingFromHTML(html),
+		FirstParagraph: getFirstParagraphFromHTML(html),
+		OutgoingLinks:  linksSlice,
+		ImageURLs:      imagesSlice,
+	}
+	return pageDataStruct
 }
