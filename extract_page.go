@@ -44,7 +44,7 @@ func getFirstParagraphFromHTML(html string) string {
 func getURLsFromHTML(htmlBody string, baseURL *url.URL) ([]string, error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlBody))
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 	}
 	// THIS signature is copy pasta from boot.dev ch1-l5
 	// For each '<a href>' it finds, it will run this function.
