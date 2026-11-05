@@ -17,6 +17,6 @@ func main() {
 	}
 	
 	if len(os.Args) - 1 == 1 {
-		fmt.Printf("starting crawl of: %v\n", os.Args[1:])
+		fmt.Printf("starting crawl of: %v\n", os.Args[1])
 	}
 }
