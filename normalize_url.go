@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/url"
+	"strings"
 )
 
 func normalizeURL(ogURL string) (string, error) {
@@ -10,5 +11,5 @@ func normalizeURL(ogURL string) (string, error) {
 	if err != nil {
 		return "", errors.New("could not parse URL")
 	}
-	return normalizedURL.Host+normalizedURL.Path, nil
+	return strings.TrimSuffix(normalizedURL.Host+normalizedURL.Path, "/"), nil
 }

@@ -7,12 +7,12 @@ import (
 
 func main() {
 	if len(os.Args) - 1 < 1 {
-		fmt.Println("no website provided\n")
+		fmt.Println("no website provided")
 		os.Exit(1)
 	}
 	
 	if len(os.Args) - 1 > 1 {
-		fmt.Println("too many arguments provided\n")
+		fmt.Println("too many arguments provided")
 		os.Exit(1)
 	}
 	
